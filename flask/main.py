@@ -3,7 +3,7 @@ import os
 import uuid
 
 import requests
-from flask import request, jsonify
+from flask import request, jsonify, render_template
 
 from ai import handle_image, modify_Item_Details_voice_Based
 from init import app, HOST, PORT, DEBUG, UPLOAD_FOLDER
@@ -42,9 +42,11 @@ def voice_conversation():
     return jsonify({"message": "Text successfully received", "text": text}), 200
 
 
-def work_on_image(image_path):
+def work_on_image(image_path, public_path = None):
     logging.info(f'Saved file: {image_path}')
     res = handle_image(image_path)
+    if public_path and isinstance(res, dict):
+        res["url"] = public_path
     print(res)
 
     IN_MEM_DB[str(uuid.uuid4())] = res
@@ -82,7 +84,7 @@ def upload_image_url():
         return jsonify({"error": "No text provided"}), 400
 
     saved_file_path = download_image_from_url(url)
-    res = work_on_image(saved_file_path)
+    res = work_on_image(saved_file_path, url)
 
     return jsonify({"message": "File successfully uploaded", "details": res}), 200
 
@@ -107,9 +109,10 @@ def download_image_from_url(image_url):
         print(f"An error occurred: {str(e)}")
 
 
-@app.route('/1/public', methods=['POST'], strict_slashes=False)
+@app.route('/1/public', methods=['GET'], strict_slashes=False)
 def store():
-    pass
+    print(IN_MEM_DB)
+    return render_template('website.html', products=IN_MEM_DB)
 
 
 if __name__ == '__main__':

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flask eCommerce Website</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 10px 20px;
+            text-align: center;
+        }
+        nav {
+            background-color: #666;
+            padding: 10px 0;
+            text-align: center;
+        }
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            padding: 10px 20px;
+        }
+        nav a:hover {
+            background-color: #444;
+        }
+        section {
+            padding: 20px;
+        }
+        footer {
+            background-color: #333;
+            color: #fff;
+            text-align: center;
+            padding: 10px 0;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+        }
+        .product {
+            border: 1px solid #ccc;
+            background-color: #fff;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+        .product img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Flask eCommerce</h1>
+    </header>
+    <nav>
+        <a href="/">Home</a>
+        <a href="/products">Products</a>
+        <a href="/cart">Cart</a>
+        <a href="/checkout">Checkout</a>
+    </nav>
+    <section>
+        <h2>Featured Products</h2>
+        {% for id, details in products.items() %}
+        <div class="product">
+            <h3>{{ details.Brand }}</h3>
+            <p>{{ details.Description }}</p>
+            <p>Price: ${{ details.Price }}</p>
+            <img src="{{ details.url }}" alt="{{ details.Brand }}">
+            <p><a href="/products/{{ id }}">View Details</a></p>
+        </div>
+        {% endfor %}
+    </section>
+    <footer>
+        <p>&copy; 2024 Flask eCommerce. All rights reserved.</p>
+    </footer>
+</body>
+</html>

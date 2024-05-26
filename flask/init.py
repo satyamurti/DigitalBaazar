@@ -12,6 +12,12 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 app = Flask(__name__, static_folder='static/wp-content', static_url_path='/wp-content')
 
+# app.use(express.static(path.join(__dirname, 'templates')));
+#
+# app.get('*', (req, res) => {
+#   res.sendFile(path.join(__dirname, 'templates', 'index.html'));
+# });
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
