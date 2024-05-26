@@ -36,6 +36,14 @@ import com.google.firebase.storage.UploadTask;
 
 import java.io.ByteArrayOutputStream;
 import java.io.Console;
+import java.io.IOException;
+
+import okhttp3.FormBody;
+import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -108,8 +116,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<Uri> task) {
                         uploadedImageUrl = task.getResult().toString();
                         Toast.makeText(MainActivity.this, "File Url" + uploadedImageUrl, Toast.LENGTH_SHORT).show();
-
-
+                        UploadToFlask(uploadedImageUrl);
                     }
                 });
             }
@@ -131,8 +138,30 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void UploadToFlask(){
+    private void UploadToFlask(String url){
+        OkHttpClient client = new OkHttpClient();
 
+        RequestBody formBody = new FormBody.Builder()
+                .add("message", "Your message")
+                .build();
+        Request request = new Request.Builder()
+                .url(url)
+                .post(formBody)
+                .build();
+
+        try {
+            Response response = client.newCall(request).execute();
+            Intent intent = new Intent(getApplicationContext(), MainActivity2.class);
+            // now by putExtra method put the value in key, value pair key is
+            // message_key by this key we will receive the value, and put the string
+            intent.putExtra("response", response.body().toString());
+            // start the Intent
+            startActivity(intent);
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     // This method will help to retrieve the image
@@ -159,3 +188,30 @@ public class MainActivity extends AppCompatActivity {
     }
 
 }
+
+//public class OkHttpHandler extends AsyncTask {
+//
+//    OkHttpClient client = new OkHttpClient();
+//
+//    @Override
+//    protected String doInBackground(String...params) {
+//
+//        Request.Builder builder = new Request.Builder();
+//        builder.url(params[0]);
+//        Request request = builder.build();
+//
+//        try {
+//            Response response = client.newCall(request).execute();
+//            return response.body().string();
+//        }catch (Exception e){
+//            e.printStackTrace();
+//        }
+//        return null;
+//    }
+//
+//    @Override
+//    protected void onPostExecute(String s) {
+//        super.onPostExecute(s);
+//        txtString.setText(s);
+//    }
+//}
