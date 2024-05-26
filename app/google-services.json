@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "314320787786",
+    "project_id": "my-hack-store",
+    "storage_bucket": "my-hack-store.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:314320787786:android:52d3d29f46c06ec328c9b3",
+        "android_client_info": {
+          "package_name": "com.example.digitalbaazar"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAMwp0uvfLgWHmgn25iX5kr0b12lfkZGf8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:314320787786:android:bf57e7ee91cbb59d28c9b3",
+        "android_client_info": {
+          "package_name": "com.example.digitalbazaar"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAMwp0uvfLgWHmgn25iX5kr0b12lfkZGf8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
