@@ -42,7 +42,7 @@ def voice_conversation():
     return jsonify({"message": "Text successfully received", "text": text}), 200
 
 
-def work_on_image(image_path, public_path = None):
+def work_on_image(image_path, public_path=None):
     logging.info(f'Saved file: {image_path}')
     res = handle_image(image_path)
     if public_path and isinstance(res, dict):
@@ -74,16 +74,16 @@ def upload_image():
 @app.route('/1/add_inventory/upload_image_url', methods=['POST'], strict_slashes=False)
 def upload_image_url():
     # Check if the POST request has 'text' in its form data
-    if 'url' not in request.form:
-        return jsonify({"error": "No text part"}), 400
+    if request.is_json:
+        # Parse JSON data from the request body
+        json_data = request.json
+        url = json_data["key"]
+    else:
+        return "INVALID"
 
-    url = request.form['url']
-
-    # Validate that text is not empty
-    if not url:
-        return jsonify({"error": "No text provided"}), 400
-
+    print(url)
     saved_file_path = download_image_from_url(url)
+    print(saved_file_path)
     res = work_on_image(saved_file_path, url)
 
     return jsonify({"message": "File successfully uploaded", "details": res}), 200

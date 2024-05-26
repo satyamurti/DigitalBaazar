@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.provider.MediaStore;
 import android.view.View;
 import android.widget.Button;
@@ -68,6 +69,13 @@ public class MainActivity extends AppCompatActivity {
         progressBarTextView = findViewById(R.id.progressTextView);
 //        FirebaseStorage storage = FirebaseStorage.getInstance();
 
+        if (android.os.Build.VERSION.SDK_INT > 9) {
+            StrictMode.ThreadPolicy gfgPolicy =
+                    new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(gfgPolicy);
+        }
+
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -116,7 +124,35 @@ public class MainActivity extends AppCompatActivity {
                     public void onComplete(@NonNull Task<Uri> task) {
                         uploadedImageUrl = task.getResult().toString();
                         Toast.makeText(MainActivity.this, "File Url" + uploadedImageUrl, Toast.LENGTH_SHORT).show();
-                        UploadToFlask(uploadedImageUrl);
+//                        UploadToFlask(uploadedImageUrl);
+//                        String res = new background(uploadedImageUrl).execute();
+
+
+                        final String[] str = {""};
+                        Thread gfgThread = new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                try  {
+                                    str[0] = UploadToFlask(uploadedImageUrl);
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+
+                        gfgThread.start();
+                        try {
+                            gfgThread.join();
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+
+                        Intent intent = new Intent(getApplicationContext(), MainActivity2.class);
+                        // now by putExtra method put the value in key, value pair key is
+                        // message_key by this key we will receive the value, and put the string
+                        intent.putExtra("response", uploadedImageUrl);
+                        // start the Intent
+                        startActivity(intent);
                     }
                 });
             }
@@ -138,30 +174,37 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void UploadToFlask(String url){
-        OkHttpClient client = new OkHttpClient();
 
-        RequestBody formBody = new FormBody.Builder()
-                .add("message", "Your message")
+    private String UploadToFlask(String url){
+        OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
+        MediaType mediaType = MediaType.parse("application/json");
+        RequestBody body = RequestBody.create(mediaType, "{\n    \"key\": \"" + url + "\"\n}");
         Request request = new Request.Builder()
-                .url(url)
-                .post(formBody)
+                .url("http://20.203.40.255:8080/1/add_inventory/upload_image_url")
+                .method("POST", body)
+                .addHeader("Content-Type", "application/json")
                 .build();
-
         try {
             Response response = client.newCall(request).execute();
-            Intent intent = new Intent(getApplicationContext(), MainActivity2.class);
-            // now by putExtra method put the value in key, value pair key is
-            // message_key by this key we will receive the value, and put the string
-            intent.putExtra("response", response.body().toString());
-            // start the Intent
-            startActivity(intent);
+//            Intent intent = new Intent(getApplicationContext(), MainActivity2.class);
+//            // now by putExtra method put the value in key, value pair key is
+//            // message_key by this key we will receive the value, and put the string
+//            intent.putExtra("response", response.body().toString());
+//            // start the Intent
+//            startActivity(intent);
 
-
+            return response.body().toString();
         } catch (IOException e) {
             e.printStackTrace();
         }
+//        Unirest.setTimeouts(0, 0);
+//        HttpResponse<String> response = Unirest.post("http://20.203.40.255:8080/1/add_inventory/upload_image_url")
+//                .header("Content-Type", "application/x-www-form-urlencoded")
+//                .field("url", url)
+//                .asString();
+//        return response;
+        return "";
     }
 
     // This method will help to retrieve the image

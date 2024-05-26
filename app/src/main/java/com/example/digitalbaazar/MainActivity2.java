@@ -38,6 +38,7 @@ public class MainActivity2 extends AppCompatActivity {
         TextView category = findViewById(R.id.category);
         Gson gson = new Gson();
 
+        System.out.println(str);
         SimpleEntity entity = gson.fromJson(str, SimpleEntity.class);
 
         title.setText(entity.title);
