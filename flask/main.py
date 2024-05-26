@@ -6,10 +6,7 @@ from flask import request, jsonify
 from ai import handle_image
 from init import app, HOST, PORT, DEBUG, UPLOAD_FOLDER
 
-
-@app.route('/upload-files-success', methods=['POST'])
-def upload_file():
-    pass
+IN_MEM_DB = {}
 
 
 @app.route('/')
@@ -51,8 +48,13 @@ def upload_image():
     logging.info(f'Saved file: {saved_file_path}')
     res = handle_image(saved_file_path)
     print(res)
-    print(type(res))
+    IN_MEM_DB[1] = res
     return jsonify({"message": "File successfully uploaded", "details": res}), 200
+
+
+@app.route('/1/public', methods=['POST'], strict_slashes=False)
+def store():
+    pass
 
 
 if __name__ == '__main__':
