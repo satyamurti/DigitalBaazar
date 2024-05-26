@@ -46,10 +46,15 @@ UPLOAD_FOLDER = 'uploads'
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
-# # Directory to store test results
-# RESULT_FOLDER = 'results'
-# if not os.path.exists(RESULT_FOLDER):
-#     os.makedirs(RESULT_FOLDER)
+# import firebase_admin
+# from firebase_admin import credentials, firestore
+#
+# # Initialize Firebase Admin SDK
+# cred = credentials.Certificate("path/to/serviceAccountKey.json")
+# firebase_admin.initialize_app(cred)
+#
+# # Initialize Firestore client
+# db = firestore.client()
 
 if DEBUG:
     PORT = 5000

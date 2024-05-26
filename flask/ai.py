@@ -55,6 +55,19 @@ def handle_image(image_url) -> dict:
     return result
 
 
+def modify_Item_Details_voice_Based(text):
+    llm = ChatGoogleGenerativeAI(model="gemini-pro")
+    message = HumanMessage(
+        content=[
+            {
+                "type": "text",
+                "text": "I have this string: " + text,
+            }
+        ]
+    )
+    return llm.invoke([message])
+
+
 def test_Gemini_Text_generation(text):
     llm = ChatGoogleGenerativeAI(model="gemini-pro")
     result = llm.invoke(text)

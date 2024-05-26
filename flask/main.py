@@ -1,9 +1,11 @@
 import logging
 import os
+import uuid
 
+import requests
 from flask import request, jsonify
 
-from ai import handle_image
+from ai import handle_image, modify_Item_Details_voice_Based
 from init import app, HOST, PORT, DEBUG, UPLOAD_FOLDER
 
 IN_MEM_DB = {}
@@ -26,9 +28,27 @@ def voice_conversation():
     if not text:
         return jsonify({"error": "No text provided"}), 400
 
-    # Process the text (for now, we'll just return it back)
-    # You can add your own processing logic here
+    # user_details = ""
+    # for k, v in IN_MEM_DB[1].items():
+    #     user_details +=
+
+    logging.info(IN_MEM_DB)
+    key = list(IN_MEM_DB.keys())[0]
+    res_modify = modify_Item_Details_voice_Based(str(IN_MEM_DB[key]) + text)
+    res_dict = res_modify.content
+    logging.info(res_dict)
+    IN_MEM_DB[key] = res_dict
+
     return jsonify({"message": "Text successfully received", "text": text}), 200
+
+
+def work_on_image(image_path):
+    logging.info(f'Saved file: {image_path}')
+    res = handle_image(image_path)
+    print(res)
+
+    IN_MEM_DB[str(uuid.uuid4())] = res
+    return res
 
 
 @app.route('/1/add_inventory/upload_image', methods=['POST'], strict_slashes=False)
@@ -45,11 +65,46 @@ def upload_image():
 
     file.save(os.path.join(UPLOAD_FOLDER, file.filename))
     saved_file_path = os.path.join(UPLOAD_FOLDER, file.filename)
-    logging.info(f'Saved file: {saved_file_path}')
-    res = handle_image(saved_file_path)
-    print(res)
-    IN_MEM_DB[1] = res
+    res = work_on_image(saved_file_path)
     return jsonify({"message": "File successfully uploaded", "details": res}), 200
+
+
+@app.route('/1/add_inventory/upload_image_url', methods=['POST'], strict_slashes=False)
+def upload_image_url():
+    # Check if the POST request has 'text' in its form data
+    if 'url' not in request.form:
+        return jsonify({"error": "No text part"}), 400
+
+    url = request.form['url']
+
+    # Validate that text is not empty
+    if not url:
+        return jsonify({"error": "No text provided"}), 400
+
+    saved_file_path = download_image_from_url(url)
+    res = work_on_image(saved_file_path)
+
+    return jsonify({"message": "File successfully uploaded", "details": res}), 200
+
+
+def download_image_from_url(image_url):
+    try:
+        # Send a GET request to the image URL
+        response = requests.get(image_url)
+        if response.status_code == 200:
+            # Extract the filename from the URL
+            filename = str(uuid.uuid4()) + ".jpg"
+            # Construct the full path to save the image
+            save_path = os.path.join(UPLOAD_FOLDER, filename)
+            # Save the image to the specified folder
+            with open(save_path, 'wb') as file:
+                file.write(response.content)
+            print(f"Image downloaded and saved successfully to: {save_path}")
+            return save_path
+        else:
+            print(f"Failed to download image. Status code: {response.status_code}")
+    except Exception as e:
+        print(f"An error occurred: {str(e)}")
 
 
 @app.route('/1/public', methods=['POST'], strict_slashes=False)
